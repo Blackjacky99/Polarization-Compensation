@@ -14,10 +14,10 @@ from qncp import acq, optics, search
 from numpy import inf
 from tkinter import *
 
-
+#to control the Newport motor, we need to install conex from newport and find the .dll file
 clr.AddReference("C:\\Windows\\Microsoft.NET\\assembly\GAC_64\\Newport.CONEXCC.CommandInterface\\v4.0_2.0.0.3__aab368c79b10b8be\\Newport.CONEXCC.CommandInterface.dll")
 
-#to control the motor, we need to install thorlab kinesis, and the following .dll file is needed
+#to control the Thorlab motor, we need to install thorlab kinesis, and the following .dll file is needed
 #clr is a package called pythonnet which enables us to load .dll file
 clr.AddReference('C:\Program Files\Thorlabs\Kinesis\Thorlabs.MotionControl.DeviceManagerCLI.dll')
 clr.AddReference('C:\Program Files\Thorlabs\Kinesis\Thorlabs.MotionControl.TCube.DCServoCLI.dll')
@@ -183,7 +183,7 @@ def to_L():
 
     if (device1.get_cur_pos() - device1Target)>Tol or float(device2.get_cur_pos() - device2Target)>Tol:
         to_L()
-
+#-----------------------------------------
 
 def move_Quarter1(targetAngle):
     global Quarter1_is_complete
@@ -204,7 +204,7 @@ def move_Half(targetAngle):
     Half_is_complete = True
 
 
-#get a rough position of half waveplate for S=[1 0 0] while browsing through half waveplate
+#Method1 for finding the HWP position: get a rough position of half waveplate for S=[1 0 0] by browsing through half waveplate
 def RecordPosition(num):
     global Half_is_complete
     global HalfTargetPosition
@@ -253,11 +253,12 @@ def search_HalfPlate():
             print(result)
     print('done')
 
-#use minimize to find half wave plate position to achieve S=[1 0 0]
+#Method2 to find HWP position: use minimize algorithm to find half wave plate position to achieve S=[1 0 0]
 def search_HalfPlate2():
     res = minimize_scalar(HalfPlate_system, bounds=(0, 180), method='bounded')
     print('half wave search done')
 
+#implement call back function to record optimal solution when use minimize algorithm to find positions of QWP 
 class Trigger(Exception):
     pass
 
@@ -336,7 +337,7 @@ def HalfPlate_system(rotation_input):
     return np.sqrt((result[0]-1)**2+(result[1]-0)**2+(result[2]-0)**2)
 
 
-
+#search for position for QWP
 def search_QuarterPlates():
     Quarter1_is_complete = True
     Quarter2_is_complete = True
@@ -401,7 +402,7 @@ search_HalfPlate2()
 
 
 
-#--------User interface--------
+#--------construct User interface--------
 def connectDevice():
     global Quarter1_serialNo_, Quarter1_serialNo_, Half_serialNo_, SourceMotor1_com, SourceMotor2_com
     try:
